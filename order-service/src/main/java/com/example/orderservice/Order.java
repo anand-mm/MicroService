@@ -1,42 +1,32 @@
 package com.example.orderservice;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@Data
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Long userId;
+    private LocalDateTime orderDate;
+    private String status;
+    private BigDecimal totalAmount;
     @OneToMany(cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
 
-    // Getters and Setters
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
-    }
-
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-    }
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }

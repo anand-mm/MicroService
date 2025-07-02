@@ -23,7 +23,7 @@ public class OrderController {
     private final RestClient restClient;
 
     public OrderController(RestClient.Builder restClientBuilder) {
-        this.restClient = restClientBuilder.baseUrl("http://localhost:8080").build(); // Base URL for API Gateway
+        this.restClient = restClientBuilder.baseUrl("http://localhost:8090").build(); // Base URL for API Gateway
     }
 
     @GetMapping
@@ -48,6 +48,7 @@ public class OrderController {
         }
 
         // 2. Get product details and verify stock by calling Product Service
+        double totalAmount = 0.0;
         for (OrderItem item : order.getOrderItems()) {
             ProductDTO product = restClient.get()
                     .uri("/products/{id}", item.getProductId())
@@ -61,11 +62,17 @@ public class OrderController {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Or a more specific error
             }
             item.setPrice(product.getPrice()); // Set the price from the product service
+            totalAmount += item.getPrice() * item.getQuantity();
             // TODO: In a real scenario, you'd also update product stock here (e.g., via
             // another REST call or event)
         }
 
-        // 3. Save the order
+        // 3. Set order details
+        order.setOrderDate(java.time.LocalDateTime.now());
+        order.setStatus("PENDING");
+        order.setTotalAmount(new java.math.BigDecimal(totalAmount));
+
+        // 4. Save the order
         Order savedOrder = orderRepository.save(order);
 
         // Publish OrderCreatedEvent to RabbitMQ
