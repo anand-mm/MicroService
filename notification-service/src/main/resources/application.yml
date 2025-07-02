@@ -8,6 +8,11 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    ip-address: 10.163.14.67
 
 server:
-  port: 0 # Assign a random port
+  port: 8094 # Assign a random port
